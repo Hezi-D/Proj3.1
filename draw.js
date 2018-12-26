@@ -1,4 +1,4 @@
-////////
+////////////////////////////////
 // Draw
 function draw(obj) {
   var doc = document;
