@@ -1,234 +1,127 @@
-
+//Index
+var coinsBasicData = {};
 var coinSelectForReportArray = [];
+var isCoinExistInArrayForReport;
 
+var chooseToReplaceCoin = false;
 
+$(document).ready(function() {
+  $("#btnTest").on("click", function() {
+    $("input[name='checkboxName1']").prop("checked", false);
+  });
 
-$(function () {
-
-    $("#HomeBtn").on("click", function () {
-
-        $.ajax({
-            method: "GET",
-            url: "https://api.coingecko.com/api/v3/coins/list",
-
-            beforeSend: function () {
-
-                $(".loading").show();
-            },
-
-            success: function (response) {
-                $(".loading").hide();
-                console.log(response);
-                draw(response);
-
-            },
-            error: function (error) {
-                console.log(error)
-            }
-        })
-    })
-
-
-    $("#ReportBtn").on("click", function () {
-        drawReport();
-        console.log("test");
-    });
-
-
-
-    //------------------------------------------------------
-
-
-
-})
-
-
-function draw(obj) {
-
-    var mainRow = $("#coinCardsDiv");
-    mainRow.innerHTML = "";
-
-    for (let index = 0; index < 30; index++) {
-
-        var checkBox = $("<label></label>");
-        var input = $("<input></input>");
-        var span = $("<span></span>");
-
-        checkBox.attr("class", "switch");
-        input.attr("type", "checkbox");
-        span.attr("class", "slider round");
-        checkBox.attr("id", index);
-
-        checkBox.append(input, span);
-
-        checkBox.on("change", function () {
-
-
-
-
-            coinsForReport(this.id);
-
-
-
-        });
-
-        var infoBtn = $("<button></button>");
-
-        infoBtn.attr("id", "infoBtn");
-        infoBtn.attr("name", index);
-        infoBtn.text("More Info");
-
-        infoBtn.on("click", function () {
-            getInfo(this.parentElement.id, this.name);
-
-        })
-
-        var title = $("<h2></h2>").text(obj[index].symbol);
-        var text = $("<h5></h5>").text(obj[index].name);
-        var infoText = $("<h5></h5>");
-        var loaderPlace = $('<div><div/>');
-        loaderPlace.attr("class", "loading");
-        loaderPlace.attr("id", "loading" + index).hide();
-        var loadingBar;
-
-        var cardBody = $("<div></div>");
-        var curDiv = $("<div></div>");
-
-        curDiv.attr("class", "card");
-
-        curDiv.attr("id", obj[index].symbol);
-        cardBody.attr("class", "card-body");
-        title.attr("class", "card-title");
-        text.attr("class", "card-title");
-        infoText.attr("class", "card-info");
-
-
-        for (let index = 0; index < 4; index++) {
-            loadingBar = $('<div class="loading-bar"/>');
-            loaderPlace.append(loadingBar);
-        }
-
-
-        //loaderPlace.hide();
-        $(".card-info").hide();
-
-        cardBody.append(checkBox);
-        cardBody.append(title);
-        cardBody.append(text);
-        curDiv.append(cardBody);
-        curDiv.append(loaderPlace);
-        curDiv.append(infoBtn);
-        curDiv.append(infoText);
-
-        mainRow.append(curDiv);
+  this.twoMinutesPassCheck = function twoMinutesPassCheck(
+    lastClickedTime,
+    curTime
+  ) {
+    if (curTime - lastClickedTime > 5000 || lastClickedTime == null) {
+      return true;
+    } else {
+      return false;
     }
-}
+  };
 
-function getInfo(id, number) {
+  this.coinsForReport = function(id) {
+    isCoinExistInArrayForReport = false;
 
-    console.log(number);
+    if (coinSelectForReportArray.length < 5) {
+      //If exist - Remove from array
+      for (let index = 0; index < coinSelectForReportArray.length; index++) {
+        if (coinSelectForReportArray[index] == coinsBasicData[id]) {
+          coinSelectForReportArray.splice(index, 1);
+          isCoinExistInArrayForReport = true;
+          break;
+        }
+      }
 
-    $.ajax({
-        method: "GET",
-        url: "https://api.coingecko.com/api/v3/coins/" + id,
+      //If NOT exist - Add to array
+      if (isCoinExistInArrayForReport == false) {
+        coinSelectForReportArray.push(coinsBasicData[id]);
+      }
+    } else {
+      for (let index = 0; index < coinSelectForReportArray.length; index++) {
+        if (coinSelectForReportArray[index] == coinsBasicData[id]) {
+          coinSelectForReportArray.splice(index, 1);
+          isCoinExistInArrayForReport = true;
+          break;
+        }
+      }
 
-        beforeSend: function () {
-
-            $('#loading' + number).show();
-            console.log(id);
-        },
-
-        success: function (response) {
-
-
-            var coinImage = $('<img />', {
-                src: response.image.small,
-            });
-
-            var USDheader = $("<h4></h4>").text("USD");
-            var coinVsUSD = $("<h5></h5>").text(response.market_data.current_price.usd + " $");
-            var EURheader = $("<h4></h4>").text("EUR");
-            var coinVsEUR = $("<h5></h5>").text(response.market_data.current_price.eur + " €");
-            var ILSheader = $("<h4></h4>").text("ILS");
-            var coinVsILS = $("<h5></h5>").text(response.market_data.current_price.ils + " NIS");
-
-            $("#" + id).find(".card-info").empty();
-            $("#" + id).find(".card-info").append(coinImage);
-            $("#" + id).find(".card-info").append(USDheader, coinVsUSD, EURheader, coinVsEUR, ILSheader, coinVsILS);
-
-        },
-        error: function (error) {
-            console.log(error)
-        },
-
-        complete: function () {
-            $('#loading' + number).hide();
-            $("#" + id).find(".card-info").slideToggle('slow');
-        },
-
-    });
-
-}
-
-function coinsForReport(id) {
-
-    if (coinSelectForReportArray.length >= 5) {
-
-        //alert("no more place");
-        drawSelectedCoinsIntoModal();
+      if (isCoinExistInArrayForReport == false) {
+        //coinSelectForReportArray.push(coinsBasicData[id]);
+        drawSelectedCoinsIntoModal(id);
+      }
     }
-    else {
+    console.log(coinSelectForReportArray);
+  };
 
-        var isExist = false;
+  function drawSelectedCoinsIntoModal(sixCoinForExchangeId) {
+    //Clear the Modal
+    $(".modal-body").empty();
 
-        for (let index = 0; index < coinSelectForReportArray.length; index++) {
-            if (coinSelectForReportArray[index] == id) {
-                coinSelectForReportArray.splice(index, 1);
-                isExist = true;
-                break;
-            }
-        }
+    //Draw the modal
+    for (let index = 0; index < coinSelectForReportArray.length; index++) {
+      var selectedCoinBtn = $("<button></button>");
+      selectedCoinBtn.attr("id", index);
 
-        if (isExist == false) {
-            coinSelectForReportArray.push(id);
+      selectedCoinBtn.attr("name", coinSelectForReportArray[index].symbol);
+      selectedCoinBtn.attr("class", "btn btn-primary");
+      selectedCoinBtn.text(coinSelectForReportArray[index].name);
 
-        }
+      //Define the buttons event
+      selectedCoinBtn.on("click", function() {
+        replaceSelectedCoin(this.id, sixCoinForExchangeId);
+        chooseToReplaceCoin = true;
+      });
 
+      $(".modal-body").append(selectedCoinBtn);
+    }
+
+    //Draw the six coin Buttoon
+    //Clear the six coin button
+    $("#sixCoinToReplace").empty();
+    var sixCoinBtn = $("<button></button>");
+    sixCoinBtn.attr("class", "btn btn-danger");
+    sixCoinBtn.text(coinsBasicData[sixCoinForExchangeId].name);
+    $("#sixCoinToReplace").append(sixCoinBtn);
+
+    //Define th modal close button event
+    noReplaceCoin(sixCoinForExchangeId);
+
+    $("#myModal").modal("show");
+  }
+
+  function noReplaceCoin(sixCoinNotAdd) {
+    $("#modal-close-btn").on("click", function() {
+      if (!chooseToReplaceCoin) {
+        $("input[name='checkboxName" + sixCoinNotAdd + "']").prop(
+          "checked",
+          false
+        );
+      }
+    });
+  }
+
+  function replaceSelectedCoin(oldCoinId, newCoinId) {
+    coinSelectForReportArray[oldCoinId] = coinsBasicData[newCoinId];
+    console.log(coinSelectForReportArray);
+    $("input[name='checkboxName" + oldCoinId + "']").prop("checked", false);
+
+    drawNewModal();
+  }
+
+  function drawNewModal() {
+    $(".modal-body").empty();
+    for (let index = 0; index < coinSelectForReportArray.length; index++) {
+      var selectedCoinBtn = $("<button></button>");
+      selectedCoinBtn.attr("id", index);
+      selectedCoinBtn.attr("name", coinSelectForReportArray[index].symbol);
+      selectedCoinBtn.attr("class", "btn btn-primary");
+      selectedCoinBtn.text(coinSelectForReportArray[index].name);
+
+      $(".modal-body").append(selectedCoinBtn);
     }
 
     console.log(coinSelectForReportArray);
-}
-
-function drawReport() {
-
-    var mainRow = $("#coinCardsDiv");
-    mainRow.infoText = "test";
-}
-
-
-function drawSelectedCoinsIntoModal() {
-
-    for (let index = 0; index < coinSelectForReportArray.length; index++) {
-        var selectedCoinBtn = $("<button></button>");
-        selectedCoinBtn.attr("id", "infoBtn");
-        selectedCoinBtn.text(coinSelectForReportArray.index.value);
-        $('.modal-body').append(selectedCoinBtn);
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  }
+});
