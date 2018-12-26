@@ -4,7 +4,7 @@ $("#HomeBtn").on("click", function() {
   //Stop the graph interval
   clearInterval(intreval);
 
-  //Clear the selectedCoinsArray
+  //Clearr the selectedCoinsArray
 
   $.ajax({
     method: "GET",
