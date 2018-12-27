@@ -17,6 +17,14 @@ $("#HomeBtn").on("click", function() {
 
       coinsBasicData = response;
 
+      //Insert index to basic data
+      var indexInData = "index";
+
+      for (let index = 0; index < coinsBasicData.length; index++) {
+        coinsBasicData[index][indexInData]= index;
+        
+      }
+
       var responseString = JSON.stringify(response);
       localStorage.setItem("allCoinsData", responseString);
 

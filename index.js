@@ -37,6 +37,7 @@ $(document).ready(function() {
       //If NOT exist - Add to array
       if (isCoinExistInArrayForReport == false) {
         coinSelectForReportArray.push(coinsBasicData[id]);
+        
       }
     } else {
       for (let index = 0; index < coinSelectForReportArray.length; index++) {
@@ -62,7 +63,7 @@ $(document).ready(function() {
     //Draw the modal
     for (let index = 0; index < coinSelectForReportArray.length; index++) {
       var selectedCoinBtn = $("<button></button>");
-      selectedCoinBtn.attr("id", index);
+      selectedCoinBtn.attr("id", coinSelectForReportArray[index].index);
 
       selectedCoinBtn.attr("name", coinSelectForReportArray[index].symbol);
       selectedCoinBtn.attr("class", "btn btn-primary");
@@ -103,7 +104,12 @@ $(document).ready(function() {
   }
 
   function replaceSelectedCoin(oldCoinId, newCoinId) {
-    coinSelectForReportArray[oldCoinId] = coinsBasicData[newCoinId];
+
+    for (let index = 0; index < coinSelectForReportArray.length; index++) {
+      if(coinSelectForReportArray[index].index == oldCoinId){
+        coinSelectForReportArray[index] = coinsBasicData[newCoinId];
+      }
+    }  
     console.log(coinSelectForReportArray);
     $("input[name='checkboxName" + oldCoinId + "']").prop("checked", false);
 
